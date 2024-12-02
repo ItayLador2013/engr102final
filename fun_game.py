@@ -14,30 +14,43 @@ clock = pygame.time.Clock()
 def write(text, font, fontsize, color, location):
     myFont = pygame.font.SysFont(font, fontsize)
     score_display = myFont.render(str(text), 1, color)
-    screen.blit(score_display,location)
+    screen.blit(score_display, location)
+
 
 def info(lives, score):
     for i in range(lives):
-        screen.blit(FULL_HEART, (i*HEART_WIDTH+HEARTS_PADDING, HEARTS_PADDING))
+        screen.blit(FULL_HEART, (i * HEART_WIDTH + HEARTS_PADDING, HEARTS_PADDING))
 
     for j in range(MAX_LIVES - lives):
-        screen.blit(EMPTY_HEART, ((lives+j)*HEART_WIDTH+HEARTS_PADDING, HEARTS_PADDING))
+        screen.blit(
+            EMPTY_HEART, ((lives + j) * HEART_WIDTH + HEARTS_PADDING, HEARTS_PADDING)
+        )
 
-    write(text=score, font="Times New Roman", fontsize=30, color=(0,0,0), location=((3 * (HEART_WIDTH + HEARTS_PADDING) / 2) - (len(str(score)) * 30) / 2, HEART_HEIGHT + HEARTS_PADDING))
+    write(
+        text=score,
+        font="Times New Roman",
+        fontsize=30,
+        color=(0, 0, 0),
+        location=(
+            (3 * (HEART_WIDTH + HEARTS_PADDING) / 2) - (len(str(score)) * 30) / 2,
+            HEART_HEIGHT + HEARTS_PADDING,
+        ),
+    )
 
-class EnemyMissile():
+
+class EnemyMissile:
     def __init__(self, y):
         self.y = y
         self.width = MISSILE_WIDTH
         self.height = MISSILE_HEIGHT
         self.body = MISSILE
-        self.x = random.randint(-100-self.width, -self.width)
+        self.x = random.randint(-100 - self.width, -self.width)
         self.destroyed = False
         self.vx = 500
 
     def update(self, dt):
         if not self.destroyed:
-            self.vx += 4  * ACCELERATION * dt
+            self.vx += 4 * ACCELERATION * dt
         else:
             self.vy = 0
             self.vx = -1000
@@ -55,13 +68,14 @@ class EnemyMissile():
                     enemy.destroyed = True
                     game.add_object(Explosion(enemy.x, enemy.y))
                     game.score += enemy.score
-        
+
     def render(self):
         if not self.destroyed:
             screen.blit(self.body, (self.x, self.y))
 
-class Warning():
-    
+
+class Warning:
+
     def __init__(self, y):
         self.x = 0
         self.y = y
@@ -69,7 +83,7 @@ class Warning():
         self.height = WARNING_HEIGHT
         self.width = WARNING_WIDTH
         self.time = 0
-    
+
     def update(self, dt):
         self.time += dt
         if self.time >= WARNING_TIME / (game.level() / 2):
@@ -79,13 +93,13 @@ class Warning():
             game.objects.append(EnemyMissile(self.y))
         self.vy = player.vy * 0.68
         self.y += self.vy * dt
-    
+
     def render(self):
         if not player.destroyed:
             screen.blit(self.body, (self.x, self.y))
 
 
-class Explosion():
+class Explosion:
     def __init__(self, x, y):
         self.explosion = random.choice(EXPLOSIONS)
         self.x = x
@@ -98,12 +112,13 @@ class Explosion():
     def render(self):
         screen.blit(self.explosion["body"], (self.x, self.y))
 
-class Cloud():
-    def __init__(self, right = 0):
+
+class Cloud:
+    def __init__(self, right=0):
         self.vx = 0
         self.vy = 0
         self.x = random.randint(screen.get_width(), screen.get_width() + 50)
-        self.y = random.randint(0, screen.get_height() * 0.75)
+        self.y = random.randint(0, int(screen.get_height() * 0.75))
         self.cloud = random.choice(CLOUDS)
         self.visible = True
 
@@ -112,13 +127,14 @@ class Cloud():
         self.x += self.vx * dt
         if self.x + self.cloud["width"] < 0:
             self.x = random.randint(screen.get_width(), screen.get_width() + 50)
-            self.y = random.randint(0, screen.get_height() * 0.75)
+            self.y = random.randint(0, int(screen.get_height() * 0.75))
             self.cloud = random.choice(CLOUDS)
 
     def render(self):
         screen.blit(self.cloud["body"], (self.x, self.y))
 
-class Missle():
+
+class Missle:
     def __init__(self, x, y, vx, vy, angle):
         self.x = x + PLAYER_FLYING_WIDTH / 2
         self.y = y + PLAYER_FLYING_HEIGHT / 2
@@ -133,7 +149,7 @@ class Missle():
     def update(self, dt):
         if not self.destroyed:
             self.vy += -4.5 * ACCELERATION * math.sin(radian(self.angle)) * dt
-            self.vx += 4.5  * ACCELERATION * math.cos(radian(self.angle)) * dt
+            self.vx += 4.5 * ACCELERATION * math.cos(radian(self.angle)) * dt
         else:
             self.vy = 0
             self.vx = -1000
@@ -147,19 +163,20 @@ class Missle():
                     enemy.destroyed = True
                     game.add_object(Explosion(enemy.x, enemy.y))
                     game.score += enemy.score
-        
+
     def render(self):
         if not self.destroyed:
             screen.blit(self.body, (self.x, self.y))
 
-class Enemy():
+
+class Enemy:
     def __init__(self):
         self.height = DRONE_HEIGHT
         self.width = DRONE_WIDTH
         self.body = DRONE
-        self.x = screen.get_width() + random.randint(0, screen.get_width() / 2)
-        self.y = random.randint(0, screen.get_height() - self.height)
-        self.vx = -1000 +random.randint(700, 900)
+        self.x = screen.get_width() + random.randint(0, int(screen.get_width() / 2))
+        self.y = random.randint(0, int(screen.get_height() - self.height))
+        self.vx = -1000 + random.randint(700, 900)
         self.destroyed = False
         self.score = DRONE_SCORE
 
@@ -172,7 +189,7 @@ class Enemy():
             game.enemies.append(Enemy())
             game.enemies.remove(self)
             if not self.destroyed:
-                game.lives = max(game.lives-1, 0)
+                game.lives = max(game.lives - 1, 0)
                 if game.lives == 0:
                     player.kill()
 
@@ -180,7 +197,8 @@ class Enemy():
         if not self.destroyed:
             screen.blit(self.body, (self.x, self.y))
 
-class Player():
+
+class Player:
     def __init__(self):
         self.body = PLAYER_FLYING
         self.og_body = PLAYER_FLYING
@@ -188,7 +206,7 @@ class Player():
         self.height = PLAYER_FLYING_HEIGHT
         self.x = 0
         self.vx = 0.0
-        self.y = screen.get_height() / 2
+        self.y = int(screen.get_height() / 2)
         self.vy = 1.0
         self.angle = 0.0
         self.fired = []
@@ -214,14 +232,18 @@ class Player():
             if game.time - self.last_fired > 1:
                 self.last_fired = game.time
                 self.fired.append(Missle(self.x, self.y, self.vx, self.vy, self.angle))
-        
-        self.vx = 0 if math.tan(radian(self.angle)) is None or math.tan(radian(self.angle)) == 0 else abs( self.vy / math.tan(radian(self.angle)))
+
+        self.vx = (
+            0
+            if math.tan(radian(self.angle)) is None or math.tan(radian(self.angle)) == 0
+            else abs(self.vy / math.tan(radian(self.angle)))
+        )
         self.body = pygame.transform.rotate(self.og_body, self.angle)
 
         for missile in self.fired:
             missile.update(dt)
 
-        if self.destroyed: 
+        if self.destroyed:
             self.vy = 0
         self.y += self.vy * dt
 
@@ -233,19 +255,20 @@ class Player():
                 game.add_object(Explosion(self.x + self.width / 2, self.y))
                 enemy.destroyed = True
                 game.add_object(Explosion(enemy.x, enemy.y))
-        
+
     def render(self):
         for index, missile in enumerate(self.fired):
             if index % 2 == 1:
                 missile.render()
         if not self.destroyed:
             screen.blit(self.body, (self.x, self.y))
-        
+
         for index, missile in enumerate(self.fired):
             if index % 2 == 0:
                 missile.render()
 
-class Game():
+
+class Game:
     def __init__(self, screen="init"):
         self.running = True
         self.background = BACKGROUND_COLOR
@@ -266,13 +289,13 @@ class Game():
         self.last_pressed = 0
         self.restarting = True
         self.letter_selected = 0
-    
+
     def pressed(self, key):
-        if self.time - self.last_pressed  > 0.2 and key:
+        if self.time - self.last_pressed > 0.2 and key:
             self.last_pressed = self.time
             return True
         return False
-    
+
     def level(self):
         return (self.time // 20) + 1
 
@@ -280,20 +303,20 @@ class Game():
         file = open("high_scores.csv", "w")
         file.write("name,score\n")
         for score in self.scores:
-            file.write(score['name'] + "," + str(score['score']) + "\n")
+            file.write(score["name"] + "," + str(score["score"]) + "\n")
         file.close()
-    
+
     def check_for_high_score(self):
         i = 0
 
         for s in self.scores:
             if self.score > s["score"]:
                 return i
-            i+=1
+            i += 1
 
         if len(self.scores) < 5:
             return len(self.scores)
-        
+
         return None
 
     def load_scores(self):
@@ -306,23 +329,23 @@ class Game():
                     continue
                 line_lst = line.split(",")
                 self.scores.append({"name": line_lst[0], "score": int(line_lst[1])})
-            self.scores.sort(key=lambda x:x["score"], reverse=True)
+            self.scores.sort(key=lambda x: x["score"], reverse=True)
         except FileNotFoundError:
             self.scores = []
 
     def end(self):
         self.running = False
         self.restarting = False
-    
+
     def add_object(self, obj):
         self.objects.append(obj)
-    
+
     def pause(self):
         self.paused = True
-    
+
     def resume(self):
         self.paused = False
-    
+
     def start(self):
         self.screen = "game"
         self.selected = 0
@@ -341,8 +364,10 @@ class Game():
             if player.destroyed and not (game.time - player.time_of_death < 2):
                 self.end_game()
                 return
-            
-            if not self.warning and self.time - self.last_fired > random.randint(WARNING_EVERY // 3, WARNING_EVERY):
+
+            if not self.warning and self.time - self.last_fired > random.randint(
+                WARNING_EVERY // 3, WARNING_EVERY
+            ):
                 self.warning = True
                 self.add_object(Warning(y=player.y))
             for obj in self.objects:
@@ -370,16 +395,23 @@ class Game():
 
         elif game.screen == "high_score":
             if self.pressed(keys[pygame.K_w]):
-                self.name[self.letter_selected] = ABC[(ABC.find(self.name[self.letter_selected]) - 1 ) % len(ABC)]
-            if self.pressed(keys[pygame.K_s]): 
-                self.name[self.letter_selected] = ABC[(ABC.find(self.name[self.letter_selected]) + 1 ) % len(ABC)]
+                self.name[self.letter_selected] = ABC[
+                    (ABC.find(self.name[self.letter_selected]) - 1) % len(ABC)
+                ]
+            if self.pressed(keys[pygame.K_s]):
+                self.name[self.letter_selected] = ABC[
+                    (ABC.find(self.name[self.letter_selected]) + 1) % len(ABC)
+                ]
             if self.pressed(keys[pygame.K_a]):
                 self.letter_selected = (self.letter_selected - 1) % len(self.name)
             if self.pressed(keys[pygame.K_d]):
                 self.letter_selected = (self.letter_selected + 1) % len(self.name)
-            
+
             if keys[pygame.K_KP_ENTER] or keys[pygame.K_RETURN]:
-                self.scores.insert(self.check_for_high_score(), {"name": ''.join(self.name), "score": self.score})
+                self.scores.insert(
+                    self.check_for_high_score(),
+                    {"name": "".join(self.name), "score": self.score},
+                )
                 self.scores = self.scores[:5]
                 self.save_score()
                 self.restarting = True
@@ -398,14 +430,40 @@ class Game():
         if self.screen == "game":
             for enemy in self.enemies:
                 enemy.render()
-            
+
             info(self.lives, self.score)
 
         elif self.screen == "init":
-            write("Start Game", font="Times New Roman", fontsize=80, color=SELECTED_COLOR if self.selected == 0 else (0,0,0), location=(screen.get_width() / 2 , screen.get_height() / 2 - 110))
-            write("High Scores", font="Times New Roman", fontsize=80, color=SELECTED_COLOR if self.selected == 1 else (0,0,0), location=(screen.get_width() / 2 , screen.get_height() / 2 + 0))
-            write("About", font="Times New Roman", fontsize=80, color=SELECTED_COLOR if self.selected == 2 else (0,0,0), location=(screen.get_width() / 2 , screen.get_height() / 2 + 110))
-
+            write(
+                "Start Game",
+                font="Times New Roman",
+                fontsize=80,
+                color=SELECTED_COLOR if self.selected == 0 else (0, 0, 0),
+                location=(
+                    int(screen.get_width() / 2),
+                    int(screen.get_height() / 2 - 110),
+                ),
+            )
+            write(
+                "High Scores",
+                font="Times New Roman",
+                fontsize=80,
+                color=SELECTED_COLOR if self.selected == 1 else (0, 0, 0),
+                location=(
+                    int(screen.get_width() / 2),
+                    int(screen.get_height() / 2 + 0),
+                ),
+            )
+            write(
+                "About",
+                font="Times New Roman",
+                fontsize=80,
+                color=SELECTED_COLOR if self.selected == 2 else (0, 0, 0),
+                location=(
+                    int(screen.get_width() / 2),
+                    int(screen.get_height() / 2 + 110),
+                ),
+            )
 
         elif self.screen == "scores":
             write(
@@ -413,9 +471,9 @@ class Game():
                 font="Times New Roman",
                 fontsize=60,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 100)
+                location=(int(screen.get_width() / 2), 100),
             )
-            
+
             for index, score in enumerate(self.scores):
                 y_position = 200 + index * 50
                 write(
@@ -423,7 +481,7 @@ class Game():
                     font="Times New Roman",
                     fontsize=40,
                     color=(0, 0, 0),
-                    location=(screen.get_width() / 2, y_position)
+                    location=(int(screen.get_width() / 2), y_position),
                 )
 
             write(
@@ -431,7 +489,7 @@ class Game():
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 580)
+                location=(int(screen.get_width() / 2), 580),
             )
 
         elif self.screen == "about":
@@ -440,56 +498,56 @@ class Game():
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 100)
+                location=(int(screen.get_width() / 2), 100),
             )
             write(
                 "from autonomous drone attack. Use S W keys",
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 130)
+                location=(int(screen.get_width() / 2), 130),
             )
             write(
                 "to control your aircraft's nose and SPACE",
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 160)
+                location=(int(screen.get_width() / 2), 160),
             )
             write(
                 "to fire rockets. If more than 3 drones get",
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 190)
+                location=(int(screen.get_width() / 2), 190),
             )
             write(
                 "passed you, you fail your mission. Watch",
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 220)
+                location=(int(screen.get_width() / 2), 220),
             )
             write(
                 "for warnings behind you that mark incoming",
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 250)
+                location=(int(screen.get_width() / 2), 250),
             )
             write(
                 "missiles. If your get hit by a missile",
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 280)
+                location=(int(screen.get_width() / 2), 280),
             )
             write(
                 "or collide with a drone, your die.",
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 310)
+                location=(int(screen.get_width() / 2), 310),
             )
 
             write(
@@ -497,14 +555,14 @@ class Game():
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 500)
+                location=(int(screen.get_width() / 2), 500),
             )
             write(
                 " the ESCAPE key.",
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 530)
+                location=(int(screen.get_width() / 2), 530),
             )
 
             write(
@@ -512,23 +570,23 @@ class Game():
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 580)
+                location=(int(screen.get_width() / 2), 580),
             )
-            
+
         elif self.screen == "high_score":
             write(
                 "NEW HIGH SCORE!",
                 font="Times New Roman",
                 fontsize=40,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 100)
+                location=(int(screen.get_width() / 2), 100),
             )
             write(
                 "FINAL SCORE: " + str(self.score),
                 font="Times New Roman",
                 fontsize=40,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 150)
+                location=(int(screen.get_width() / 2), 150),
             )
 
             write(
@@ -536,7 +594,7 @@ class Game():
                 font="Times New Roman",
                 fontsize=25,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 200)
+                location=(int(screen.get_width() / 2), 200),
             )
 
             for index, char in enumerate(self.name):
@@ -544,8 +602,10 @@ class Game():
                     f"{char}",
                     font="Times New Roman",
                     fontsize=60,
-                    color= SELECTED_COLOR if self.letter_selected == index else (0, 0, 0),
-                    location=(screen.get_width() / 2 + 45 * index , 300)
+                    color=(
+                        SELECTED_COLOR if self.letter_selected == index else (0, 0, 0)
+                    ),
+                    location=(int(screen.get_width() / 2 + 45 * index), 300),
                 )
 
             write(
@@ -553,9 +613,8 @@ class Game():
                 font="Times New Roman",
                 fontsize=25,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 400)
+                location=(int(screen.get_width() / 2), 400),
             )
-
 
         elif self.screen == "end":
             write(
@@ -563,30 +622,31 @@ class Game():
                 font="Times New Roman",
                 fontsize=40,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 100)
+                location=(int(screen.get_width() / 2), 100),
             )
             write(
                 "FINAL SCORE: " + str(self.score),
                 font="Times New Roman",
                 fontsize=40,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 150)
+                location=(int(screen.get_width() / 2), 150),
             )
             write(
                 "press ENTER / RETURN to restart",
                 font="Times New Roman",
                 fontsize=30,
                 color=(0, 0, 0),
-                location=(screen.get_width() / 2, 200)
+                location=(int(screen.get_width() / 2), 200),
             )
-                
+
+
 restarting = True
 high_scored = False
 while restarting:
     game = Game() if not high_scored else Game("scores")
     player = Player()
     for i in range(3):
-        game.add_object(Cloud(random.randint(0, screen.get_width() * 0.75)))
+        game.add_object(Cloud(random.randint(0, int(screen.get_width() * 0.75))))
     game.add_object(player)
     game.load_scores()
 
@@ -596,7 +656,6 @@ while restarting:
             if event.type == pygame.QUIT:
                 game.end()
         keys = pygame.key.get_pressed()
-        
 
         if game.screen == "game" and keys[pygame.K_ESCAPE]:
             game.pause()
