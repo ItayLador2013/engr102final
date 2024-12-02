@@ -1,62 +1,70 @@
-import pygame
+import pygame #import pygame which is a library for graphics
 import math
-from screeninfo import get_monitors
+import random 
 
-monitor = get_monitors()[0]
+BACKGROUND_COLOR = (135, 206, 235) #the sky color
+SCREEN_WIDTH = 1280 
+SCREEN_HEIGHT = 720
+GRAVITY = 321 #accaliration due to gravity
 
-
-BACKGROUND_COLOR = (135, 206, 235)
-SCREEN_WIDTH = monitor.width / 1.5
-SCREEN_HEIGHT = monitor.height / 1.5
-GRAVITY = 321
-
-PLAYER_FLYING = pygame.image.load("assets/f35-fly.png")
+PLAYER_FLYING = pygame.image.load("assets/f35-fly.png") #load the player jet image
 PLAYER_FLYING_WIDTH = 265
 PLAYER_FLYING_HEIGHT = 66
-ACCELERATION = 400
+ACCELERATION = 400 #acceleration constant for player missiles
 
-FLAME = pygame.image.load("assets/f35-flame.png")
-FLAME_HEIGHT = 76
-
-MISSILE = pygame.image.load("assets/missile.png")
+MISSILE = pygame.image.load("assets/missile.png") #load the missile image
 MISSILE_WIDTH = 192
-MISSILE_HEIGHT = 50
+MISSILE_HEIGHT = 50 
 
-BOMB = pygame.image.load("assets/bomb.png")
-BOMB_WIDTH = 80
-BOMB_HEIGHT = 22
-
+#load the different clouds their images and their respective dimensions
 CLOUDS = [
-    {"body": pygame.image.load("assets/clouds/1.png"), "width": 1290, "height": 1290},
-    {"body": pygame.image.load("assets/clouds/2.png"), "width": 1290, "height": 1290},
-    {"body": pygame.image.load("assets/clouds/3.png"), "width": 1292, "height": 1290},
-    {"body": pygame.image.load("assets/clouds/4.png"), "width": 1290, "height": 1290},
+    {
+        "body": pygame.image.load("assets/clouds/1.png"),
+        "width": 1290,
+        "height": 1290
+    },
+    {
+        "body": pygame.image.load("assets/clouds/2.png"),
+        "width": 1290,
+        "height": 1290
+    },
+    {
+        "body": pygame.image.load("assets/clouds/3.png"),
+        "width": 1292,
+        "height": 1290
+    },
+    {
+        "body": pygame.image.load("assets/clouds/4.png"),
+        "width": 1290,
+        "height": 1290
+    },
 ]
 
+#load the hear images
 FULL_HEART = pygame.image.load("assets/heart-full.png")
 EMPTY_HEART = pygame.image.load("assets/heart-empty.png")
 HEART_WIDTH = 41
 HEART_HEIGHT = 36
-MAX_LIVES = 3
-HEARTS_PADDING = 10
 
-DRONE = pygame.image.load("assets/drone1.png")
+MAX_LIVES = 3 #max number of lives
+HEARTS_PADDING = 10 #padding for the heart graphics
+
+DRONE = pygame.image.load("assets/drone1.png") #load enemy drone image
 DRONE_HEIGHT = 28
 DRONE_WIDTH = 134
-DRONE_SCORE = 10
+DRONE_SCORE = 10 #score increase for every drone destroyed
 
-WARNING = pygame.image.load("assets/warning.png")
+WARNING = pygame.image.load("assets/warning.png") #load the warning image
 WARNING_WIDTH = 50
 WARNING_HEIGHT = 45
-WARNING_EVERY = 10
-WARNING_TIME = 4
 
-ENEMY_MISSILE = pygame.image.load("assets/missile-enemy.png")
-ENEMY_MISSILE_WIDTH = 84
-ENEMY_MISSILE_HEIGHT = 22
+WARNING_EVERY = 10 #constant for warning every period of time
+WARNING_TIME = 4 #constant for how much time the warning exists before enemy missile coming
 
-ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" #the alphabet - loaded like this for working with indecies
+
+#load the different explosions their images and their respective dimensions
 EXPLOSIONS = [
     {
         "body": pygame.image.load("assets/explosion1.png"),
@@ -80,18 +88,19 @@ EXPLOSIONS = [
     },
 ]
 
-SELECTED_COLOR = (0, 200, 83)
+SELECTED_COLOR = (0, 200, 83) #the color of selected text
 
-
-def collision(self, obj, plane=False):
-    x = self.x if not plane else self.x + self.width * 0.6
+def collision(self, obj, plane=False) -> bool:
+    """finds wheter object's rectangle dimensions overlap - returns True if yes and False if no"""
+    x = self.x if not plane else self.x + self.width * 0.6 
     return not (
-        x + self.width <= obj.x  # Self is to the left of obj
-        or x >= obj.x + obj.width  # Self is to the right of obj
-        or self.y + self.height <= obj.y  # Self is above obj
-        or self.y >= obj.y + obj.height  # Self is below obj
+        x + self.width <= obj.x or  #self is to the left of obj
+        x >= obj.x + obj.width or   #self is to the right of obj
+        self.y + self.height <= obj.y or #self is above obj
+        self.y >= obj.y + obj.height     #self is below obj
     )
 
-
-def radian(degree):
+def radian(degree) -> float:
+    """convert degrees to radians"""
     return (degree * math.pi) / 180
+
